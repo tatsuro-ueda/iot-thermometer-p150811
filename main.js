@@ -23,6 +23,16 @@ function insertData() {
   var lastRow = sheet.getLastRow();
   var lastTemp = sheet.getRange(lastRow, 2).getValue();
 
+  function mailedInTwoHours() {
+    for (var i = 1; i <= 24; i++) {
+      var value = sheet.getRange(lastRow - 24 + i, 3).getValue();
+      if (value === 1) {
+        return 1;
+      }
+    }
+    return 0;
+  }
+  
   // 新しいデータを追記する
   var newTemp = getPercent();
   //var datetime = getDatetimeNowInFormat();
@@ -30,13 +40,13 @@ function insertData() {
   sheet.deleteRows(2, 1);  // 2行目を削除する
   sheet.appendRow([datetime, newTemp]);
 
-  if (lastTemp < 33.0 && 33.0 <= newTemp) {
+  if (lastTemp < 33 && 33 <= newTemp) {
     if (mailedInTwoHours()) {
       return;
     } else {
       var MESSAGE = "寝室の気温が33°を超えました";
       GmailApp.sendEmail(env.email.tatsuro, MESSAGE, datetime);
-      GmailApp.sendEmail(env.email.nobue, MESSAGE, datetime);
+      //GmailApp.sendEmail(env.email.nobue, MESSAGE, datetime);
       sheet.getRange(lastRow, 3).setValue(1);
     }
   }
@@ -61,14 +71,3 @@ function getPercentDirectly() {
   );
 }
 
-function mailedInTwoHours() {
-  var sheet = SpreadsheetApp.getActiveSheet();
-  for (var i = 1; i <= 24; i++) {
-    var lastRow = sheet.getLastRow();
-    var value = sheet.getRange(lastRow - 24 + i, 3).getValue();
-    if (value === 1) {
-      return 1;
-    }
-  }
-  return 0;
-}
