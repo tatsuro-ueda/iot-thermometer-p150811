@@ -1,8 +1,8 @@
 function myFunction() {
   var response = UrlFetchApp.fetch(
     "https://cloudbit-webapi-p150705.herokuapp.com/input?" + 
-    "CLOUDBIT_DEVICE_ID=" + deviceId() +
-    "&CLOUDBIT_ACCESS_TOKEN=" + accessToken());
+    "CLOUDBIT_DEVICE_ID=" + env.deviceId +
+    "&CLOUDBIT_ACCESS_TOKEN=" + env.accessToken);
   response = response.toString();
   var json = JSON.parse(response);
   Browser.msgBox(json.absolute/10);
@@ -12,8 +12,8 @@ function getPercent() {
   // 電圧（室温）を取得する
   var response = UrlFetchApp.fetch(
     "https://cloudbit-webapi-p150705.herokuapp.com/input?" + 
-    "CLOUDBIT_DEVICE_ID=" + deviceId() +
-    "&CLOUDBIT_ACCESS_TOKEN=" + accessToken());
+    "CLOUDBIT_DEVICE_ID=" + env.deviceId +
+    "&CLOUDBIT_ACCESS_TOKEN=" + env.accessToken);
   var json = JSON.parse(response.toString());
   return json.absolute/10;
 }  
@@ -31,12 +31,12 @@ function insertData() {
   sheet.appendRow([datetime, newTemp]);
 
   if (lastTemp < 33.0 && 33.0 <= newTemp) {
-    if (mailedInOneHour()) {
+    if (mailedInTwoHours()) {
       return;
     } else {
       var MESSAGE = "寝室の気温が33°を超えました";
-      GmailApp.sendEmail(emailTatsuro(), MESSAGE, datetime);
-      GmailApp.sendEmail(emailNobue(), MESSAGE, datetime);
+      GmailApp.sendEmail(env.email.tatsuro, MESSAGE, datetime);
+      GmailApp.sendEmail(env.email.nobue, MESSAGE, datetime);
       sheet.getRange(lastRow, 3).setValue(1);
     }
   }
@@ -61,11 +61,11 @@ function getPercentDirectly() {
   );
 }
 
-function mailedInOneHour() {
+function mailedInTwoHours() {
   var sheet = SpreadsheetApp.getActiveSheet();
-  for (var i = 1; i <= 12; i++) {
+  for (var i = 1; i <= 24; i++) {
     var lastRow = sheet.getLastRow();
-    var value = sheet.getRange(lastRow - 12 + i, 3).getValue();
+    var value = sheet.getRange(lastRow - 24 + i, 3).getValue();
     if (value === 1) {
       return 1;
     }
