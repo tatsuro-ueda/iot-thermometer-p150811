@@ -23,14 +23,28 @@ function insertData() {
   var lastRow = sheet.getLastRow();
   var lastTemp = sheet.getRange(lastRow, 2).getValue();
 
-  function mailedInTwoHours() {
+  function mailedInLastTwoHours() {
     for (var i = 1; i <= 24; i++) {
       var value = sheet.getRange(lastRow - 24 + i, 3).getValue();
       if (value === 1) {
-        return 1;
+        return true;
       }
     }
-    return 0;
+    return false;
+  }
+
+  function averageOfLastTwoHoursIsHigher() {
+    var sum = 0, average = 0;
+    for (var i = 1; i <= 24; i++) {
+      var value = sheet.getRange(lastRow - 24 + i, 2).getValue();
+      sum += value;
+    }
+    average = sum / 24;
+    if (33.0 < average) {
+      return true;
+    } else {
+      return false;
+    }
   }
   
   // 新しいデータを追記する
@@ -41,7 +55,7 @@ function insertData() {
   sheet.appendRow([datetime, newTemp]);
 
   if (lastTemp < 33 && 33 <= newTemp) {
-    if (mailedInTwoHours()) {
+    if (mailedInLastTwoHours() || averageOfLastTwoHoursIsHigher()) {
       return;
     } else {
       var MESSAGE = "寝室の気温が33°を超えました";
@@ -70,4 +84,3 @@ function getPercentDirectly() {
     response
   );
 }
-
