@@ -47,10 +47,23 @@ function insertData() {
     }
   }
   
+  // 1桁の数字を0埋めで2桁にする
+  // http://tagamidaiki.com/javascript-0-chink/
+  var toDoubleDigits = function(num) {
+    num += "";
+    if (num.length === 1) {
+      num = "0" + num;
+    }
+    return num;     
+  };
+  
   // 新しいデータを追記する
   var newTemp = getPercent();
   //var datetime = getDatetimeNowInFormat();
   var datetime = new Date();
+  var hh = toDoubleDigits(datetime.getHours());
+  var mm = toDoubleDigits(datetime.getMinutes());
+  var strTime = hh + ":" + mm;
   sheet.deleteRows(2, 1);  // 2行目を削除する
   sheet.appendRow([datetime, newTemp]);
 
@@ -61,11 +74,11 @@ function insertData() {
       var MESSAGE = "寝室の気温が33°を超えました";
       // ツイートする
       var res = Twitter.tweet(
-        MESSAGE + "：" + datetime + 
+        MESSAGE + " " + strTime + 
         " by 温度計IoT http://qiita.com/weed/items/7ff7185ad76e591e684b");
       // メールする
-      GmailApp.sendEmail(env.email.tatsuro, MESSAGE, datetime);
-      GmailApp.sendEmail(env.email.nobue, MESSAGE, datetime);
+      GmailApp.sendEmail(env.email.tatsuro, strTime + " " + MESSAGE, "");
+      GmailApp.sendEmail(env.email.nobue, strTime + " " + MESSAGE, "");
       sheet.getRange(lastRow, 3).setValue(1);
     }
   }
