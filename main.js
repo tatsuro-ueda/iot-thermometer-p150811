@@ -59,8 +59,13 @@ function insertData() {
       return;
     } else {
       var MESSAGE = "寝室の気温が33°を超えました";
+      // ツイートする
+      var res = Twitter.tweet(
+        MESSAGE + "：" + datetime + 
+        " by 温度計IoT http://qiita.com/weed/items/7ff7185ad76e591e684b");
+      // メールする
       GmailApp.sendEmail(env.email.tatsuro, MESSAGE, datetime);
-      //GmailApp.sendEmail(env.email.nobue, MESSAGE, datetime);
+      GmailApp.sendEmail(env.email.nobue, MESSAGE, datetime);
       sheet.getRange(lastRow, 3).setValue(1);
     }
   }
