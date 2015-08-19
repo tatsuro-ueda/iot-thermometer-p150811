@@ -42,7 +42,7 @@ function insertData() {
       var value = sheet.getRange(lastRow - 12*n + i, 2).getValue();
       sum += value;
     }
-    average = sum / 24;
+    average = sum / (12*n);
     if (33.0 < average) {
       return true;
     } else {
@@ -59,14 +59,22 @@ function insertData() {
     }
     return num;     
   };
-  
+    
+  function sendEmailWithChart(to, subject, body) {
+    var chart = (sheet.getCharts())[0].getBlob();
+    MailApp.sendEmail({
+      to: to,
+      subject: subject,
+      htmlBody: "<img src='cid:sampleCharts'><br>" + body,
+      inlineImages: {
+        sampleCharts: chart
+      }
+    });
+  }
+    
   // 新しいデータを追記する
   var newTemp = getPercent();
-  //var datetime = getDatetimeNowInFormat();
   var datetime = new Date();
-  var hh = toDoubleDigits(datetime.getHours());
-  var mm = toDoubleDigits(datetime.getMinutes());
-  var strTime = hh + ":" + mm;
   sheet.deleteRows(2, 1);  // 2行目を削除する
   sheet.appendRow([datetime, newTemp]);
 
@@ -74,14 +82,17 @@ function insertData() {
     if (mailedInLastNHours(HOURS) || lastTwoHoursAverageIsHigher(HOURS)) {
       return;
     } else {
+      var hh = toDoubleDigits(datetime.getHours());
+      var mm = toDoubleDigits(datetime.getMinutes());
+      var strTime = hh + ":" + mm;
       var MESSAGE = "寝室の気温が33°を超えました";
       // ツイートする
       var res = Twitter.tweet(
         MESSAGE + " " + strTime + 
         " by #IoT 温度計 http://qiita.com/weed/items/7ff7185ad76e591e684b");
       // メールする
-      GmailApp.sendEmail(env.email.tatsuro, strTime + " " + MESSAGE, average);
-      GmailApp.sendEmail(env.email.nobue, strTime + " " + MESSAGE, "");
+      sendEmailWithChart(env.email.tatsuro, MESSAGE + " " + strTime, average);
+      sendEmailWithChart(env.email.nobue  , MESSAGE + " " + strTime, "");
       sheet.getRange(lastRow, 3).setValue(1);
     }
   }
