@@ -35,8 +35,9 @@ function insertData() {
     return false;
   }
 
+  var average = 0;
   function lastNHoursAverageIsHigher(n) {
-    var sum = 0, average = 0;
+    var sum = 0;
     for (var i = 1; i <= 12*n; i++) {
       var value = sheet.getRange(lastRow - 12*n + i, 2).getValue();
       sum += value;
@@ -79,7 +80,7 @@ function insertData() {
         MESSAGE + " " + strTime + 
         " by 温度計IoT http://qiita.com/weed/items/7ff7185ad76e591e684b");
       // メールする
-      GmailApp.sendEmail(env.email.tatsuro, strTime + " " + MESSAGE, "");
+      GmailApp.sendEmail(env.email.tatsuro, strTime + " " + MESSAGE, average);
       GmailApp.sendEmail(env.email.nobue, strTime + " " + MESSAGE, "");
       sheet.getRange(lastRow, 3).setValue(1);
     }
