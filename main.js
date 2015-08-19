@@ -1,3 +1,5 @@
+HOURS = 4;
+
 function myFunction() {
   var response = UrlFetchApp.fetch(
     "https://cloudbit-webapi-p150705.herokuapp.com/input?" + 
@@ -23,9 +25,9 @@ function insertData() {
   var lastRow = sheet.getLastRow();
   var lastTemp = sheet.getRange(lastRow, 2).getValue();
 
-  function mailedInLastTwoHours() {
-    for (var i = 1; i <= 24; i++) {
-      var value = sheet.getRange(lastRow - 24 + i, 3).getValue();
+  function mailedInLastNHours(n) {
+    for (var i = 1; i <= 12*n; i++) {
+      var value = sheet.getRange(lastRow - 12*n + i, 3).getValue();
       if (value === 1) {
         return true;
       }
@@ -33,10 +35,10 @@ function insertData() {
     return false;
   }
 
-  function averageOfLastTwoHoursIsHigher() {
+  function lastNHoursAverageIsHigher(n) {
     var sum = 0, average = 0;
-    for (var i = 1; i <= 24; i++) {
-      var value = sheet.getRange(lastRow - 24 + i, 2).getValue();
+    for (var i = 1; i <= 12*n; i++) {
+      var value = sheet.getRange(lastRow - 12*n + i, 2).getValue();
       sum += value;
     }
     average = sum / 24;
@@ -68,7 +70,7 @@ function insertData() {
   sheet.appendRow([datetime, newTemp]);
 
   if (lastTemp < 33 && 33 <= newTemp) {
-    if (mailedInLastTwoHours() || averageOfLastTwoHoursIsHigher()) {
+    if (mailedInLastNHours(HOURS) || lastTwoHoursAverageIsHigher(HOURS)) {
       return;
     } else {
       var MESSAGE = "寝室の気温が33°を超えました";
