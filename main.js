@@ -78,7 +78,7 @@ function insertData() {
       // ツイートする
       var res = Twitter.tweet(
         MESSAGE + " " + strTime + 
-        " by 温度計IoT http://qiita.com/weed/items/7ff7185ad76e591e684b");
+        " by #IoT 温度計 http://qiita.com/weed/items/7ff7185ad76e591e684b");
       // メールする
       GmailApp.sendEmail(env.email.tatsuro, strTime + " " + MESSAGE, average);
       GmailApp.sendEmail(env.email.nobue, strTime + " " + MESSAGE, "");
