@@ -1,4 +1,5 @@
 HOURS = 4;
+ALERT_TEMP = 30;
 
 function myFunction() {
   var response = UrlFetchApp.fetch(
@@ -43,7 +44,7 @@ function insertData() {
       sum += value;
     }
     average = sum / (12*n);
-    if (33.0 < average) {
+    if (ALERT_TEMP < average) {
       return true;
     } else {
       return false;
@@ -78,14 +79,14 @@ function insertData() {
   sheet.deleteRows(2, 1);  // 2行目を削除する
   sheet.appendRow([datetime, newTemp]);
 
-  if (lastTemp < 33 && 33 <= newTemp) {
+  if (lastTemp < ALERT_TEMP && ALERT_TEMP <= newTemp) {
     if (mailedInLastNHours(HOURS) || lastTwoHoursAverageIsHigher(HOURS)) {
       return;
     } else {
       var hh = toDoubleDigits(datetime.getHours());
       var mm = toDoubleDigits(datetime.getMinutes());
       var strTime = hh + ":" + mm;
-      var MESSAGE = "寝室の気温が33°を超えました";
+      var MESSAGE = "寝室の気温が"+ALERT_TEMP+"°を超えました";
       // ツイートする
       var res = Twitter.tweet(
         MESSAGE + " " + strTime + 
