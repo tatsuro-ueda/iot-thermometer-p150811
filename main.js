@@ -78,6 +78,8 @@ function insertData() {
   var datetime = new Date();
   sheet.deleteRows(2, 1);  // 2行目を削除する
   sheet.appendRow([datetime, newTemp]);
+  var newDateCell = sheet.getRange(sheet.getLastRow(), 1);
+  newDateCell.setNumberFormat("M/d h:mm");
 
   if (lastTemp < ALERT_TEMP && ALERT_TEMP <= newTemp) {
     if (mailedInLastNHours(HOURS) || lastTwoHoursAverageIsHigher(HOURS)) {
